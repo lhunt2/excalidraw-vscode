@@ -24,7 +24,7 @@
         "url": "https://github.com/pomdtr"
     },
     "activationEvents": [
-        "workspaceContains:**/*.{excalidraw,excalidraw.svg,excalidraw.png}"
+        "workspaceContains:**/*.{excalidraw,excalidraw.svg,excalidraw.png,excalidraw.md}"
     ],
     "repository": {
         "type": "git",
@@ -97,6 +97,12 @@
                 "category": "Excalidraw",
                 "title": "Open Image to the Side",
                 "icon": "$(go-to-file)"
+            },
+            {
+                "command": "excalidraw.newMarkdownFile",
+                "category": "Excalidraw",
+                "title": "New Drawing (Obsidian .md)",
+                "icon": "$(new-file)"
             }
         ],
         "configuration": [
@@ -292,20 +298,24 @@
                 {
                     "command": "excalidraw.showImageToSide",
                     "when": "false"
+                },
+                {
+                    "command": "excalidraw.newMarkdownFile",
+                    "when": "true"
                 }
             ],
             "editor/title": [
                 {
                     "command": "excalidraw.showEditor",
                     "alt": "excalidraw.showEditorToSide",
-                    "when": "activeCustomEditorId != 'editor.excalidraw' && resourceFilename =~ /^.+\\.excalidraw(.png|.svg)?$/",
+                    "when": "activeCustomEditorId != 'editor.excalidraw' && resourceFilename =~ /^.+\\.excalidraw(.png|.svg|.md)?$/",
                     "group": "navigation"
                 },
                 {
                     "command": "excalidraw.showSource",
                     "alt": "excalidraw.showSourceToSide",
                     "group": "navigation",
-                    "when": "activeCustomEditorId == 'editor.excalidraw' && resourceFilename =~ /^.+\\.excalidraw(.svg)?$/"
+                    "when": "activeCustomEditorId == 'editor.excalidraw' && resourceFilename =~ /^.+\\.excalidraw(.svg|.md)?$/"
                 },
                 {
                     "command": "excalidraw.showImage",
@@ -322,6 +332,9 @@
             "file/newFile": [
                 {
                     "command": "excalidraw.newFile"
+                },
+                {
+                    "command": "excalidraw.newMarkdownFile"
                 }
             ]
         },
@@ -342,6 +355,9 @@
                     },
                     {
                         "filenamePattern": "*.excalidraw.png"
+                    },
+                    {
+                        "filenamePattern": "*.excalidraw.md"
                     }
                 ]
             }
