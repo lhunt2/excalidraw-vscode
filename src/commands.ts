@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { newUntitledExcalidrawDocument } from "./utils";
+import { newUntitledExcalidrawDocument, newExcalidrawMarkdownDocument } from "./utils";
 
 function getConfigurationScope(
   config: vscode.WorkspaceConfiguration,
@@ -101,6 +101,14 @@ async function newFile() {
   }
 }
 
+async function newMarkdownFile() {
+  try {
+    await newExcalidrawMarkdownDocument();
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to create new Markdown file: ${error}`);
+  }
+}
+
 export function registerCommands(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("excalidraw.newFile", newFile)
@@ -137,5 +145,8 @@ export function registerCommands(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(
     vscode.commands.registerCommand("excalidraw.preventDefault", () => {})
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("excalidraw.newMarkdownFile", newMarkdownFile)
   );
 }
