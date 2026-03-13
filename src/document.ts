@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import { MarkdownExcalidrawAdapter, type ParseResult } from "./markdown-adapter";
 
 export class ExcalidrawDocument implements vscode.CustomDocument {
   uri: vscode.Uri;
@@ -9,8 +10,14 @@ export class ExcalidrawDocument implements vscode.CustomDocument {
   public onDidContentChange = this._onDidContentChange.event;
 
   public readonly contentType;
+  public markdownMetadata?: Omit<ParseResult, "json">;
+  private static adapter = new MarkdownExcalidrawAdapter();
 
   getContentType(): string {
+    const fsPath = this.uri.fsPath;
+    if (fsPath.endsWith(".excalidraw.md")) {
+      return "text/x-excalidraw-markdown";
+    }
     switch (path.parse(this.uri.fsPath).ext) {
       case ".svg":
         return "image/svg+xml";
@@ -23,13 +30,27 @@ export class ExcalidrawDocument implements vscode.CustomDocument {
 
   constructor(uri: vscode.Uri, content: Uint8Array) {
     this.uri = uri;
-    this.content = content;
     this.contentType = this.getContentType();
+    if (this.contentType === "text/x-excalidraw-markdown") {
+      const text = new TextDecoder().decode(content);
+      const result = ExcalidrawDocument.adapter.parse(text);
+      this.markdownMetadata = { frontmatter: result.frontmatter, compressionFormat: result.compressionFormat, passthroughContent: result.passthroughContent };
+      this.content = new TextEncoder().encode(result.json);
+    } else {
+      this.content = content;
+    }
   }
 
   async revert() {
     const content = await vscode.workspace.fs.readFile(this.uri);
-    this.content = content;
+    if (this.contentType === "text/x-excalidraw-markdown") {
+      const text = new TextDecoder().decode(content);
+      const result = ExcalidrawDocument.adapter.parse(text);
+      this.markdownMetadata = { frontmatter: result.frontmatter, compressionFormat: result.compressionFormat, passthroughContent: result.passthroughContent };
+      this.content = new TextEncoder().encode(result.json);
+    } else {
+      this.content = content;
+    }
   }
 
   async backup(destination: vscode.Uri): Promise<vscode.CustomDocumentBackup> {
@@ -54,7 +75,15 @@ export class ExcalidrawDocument implements vscode.CustomDocument {
   }
 
   async saveAs(destination: vscode.Uri) {
-    return vscode.workspace.fs.writeFile(destination, this.content);
+    let output: Uint8Array;
+    if (this.contentType === "text/x-excalidraw-markdown" && this.markdownMetadata) {
+      const json = new TextDecoder().decode(this.content);
+      const markdown = ExcalidrawDocument.adapter.serialize(json, this.markdownMetadata);
+      output = new TextEncoder().encode(markdown);
+    } else {
+      output = this.content;
+    }
+    return vscode.workspace.fs.writeFile(destination, output);
   }
 
   private readonly _onDidDispose = new vscode.EventEmitter<void>();
