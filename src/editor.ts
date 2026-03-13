@@ -96,7 +96,13 @@ export class ExcalidrawEditorProvider
         openContext.backupId ? vscode.Uri.parse(openContext.backupId) : uri
       );
     }
-    const document = new ExcalidrawDocument(uri, content);
+    let document: ExcalidrawDocument;
+    try {
+      document = new ExcalidrawDocument(uri, content);
+    } catch (e) {
+      vscode.window.showErrorMessage(`Failed to open ${uri.fsPath}: ${e instanceof Error ? e.message : e}`);
+      throw e;
+    }
 
     const onDidDocumentChange = document.onDidContentChange(() => {
       this._onDidChangeCustomDocument.fire({ document });
@@ -257,7 +263,7 @@ export class ExcalidrawEditor {
 
     this.webview.html = await this.buildHtmlForWebview({
       content: Array.from(this.document.content),
-      contentType: this.document.contentType,
+      contentType: this.document.contentType === "text/x-excalidraw-markdown" ? "application/json" : this.document.contentType,
       library: await this.loadLibrary(libraryUri),
       viewModeEnabled: this.isViewOnly() || undefined,
       theme: this.getTheme(),
@@ -294,6 +300,10 @@ export class ExcalidrawEditor {
   }
 
   public extractName(uri: vscode.Uri) {
+    const basename = path.parse(uri.fsPath).base;
+    if (basename.endsWith(".excalidraw.md")) {
+      return basename.slice(0, -14);
+    }
     const name = path.parse(uri.fsPath).name;
     return name.endsWith(".excalidraw") ? name.slice(0, -11) : name;
   }
@@ -427,6 +437,7 @@ async function openLink(uri: vscode.Uri, source: vscode.Uri): Promise<void> {
   }
 
   const extensions = [
+    ".excalidraw.md",
     ".excalidraw",
     ".excalidraw.json",
     ".excalidraw.png",
