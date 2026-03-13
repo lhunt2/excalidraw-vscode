@@ -66,7 +66,7 @@ export class ExcalidrawDocument implements vscode.CustomDocument {
   }
 
   async save() {
-    this.saveAs(this.uri);
+    return this.saveAs(this.uri);
   }
 
   async update(content: Uint8Array) {
