@@ -1,10 +1,10 @@
 {
-    "name": "excalidraw-editor",
+    "name": "excalidraw-unified",
     "icon": "assets/logo.png",
-    "displayName": "Excalidraw",
-    "description": "Draw schemas in VS Code using Excalidraw",
-    "version": "3.9.1",
-    "publisher": "pomdtr",
+    "displayName": "Excalidraw Unified",
+    "description": "Draw schemas in VS Code using Excalidraw — supports both .excalidraw and .excalidraw.md (Obsidian) formats",
+    "version": "4.0.0",
+    "publisher": "lancehunt",
     "engines": {
         "vscode": "^1.63.0"
     },
