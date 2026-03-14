@@ -103,6 +103,18 @@
                 "category": "Excalidraw",
                 "title": "New Drawing (Obsidian .md)",
                 "icon": "$(new-file)"
+            },
+            {
+                "command": "excalidraw.importFromObsidian",
+                "category": "Excalidraw",
+                "title": "Import from Obsidian",
+                "icon": "$(cloud-download)"
+            },
+            {
+                "command": "excalidraw.convertMarkdownToExcalidraw",
+                "category": "Excalidraw",
+                "title": "Convert .excalidraw.md to .excalidraw",
+                "icon": "$(file-symlink-file)"
             }
         ],
         "configuration": [
@@ -302,6 +314,14 @@
                 {
                     "command": "excalidraw.newMarkdownFile",
                     "when": "true"
+                },
+                {
+                    "command": "excalidraw.importFromObsidian",
+                    "when": "true"
+                },
+                {
+                    "command": "excalidraw.convertMarkdownToExcalidraw",
+                    "when": "resourceFilename =~ /\\.excalidraw\\.md$/"
                 }
             ],
             "editor/title": [
@@ -326,6 +346,13 @@
                 {
                     "command": "excalidraw.updateTheme",
                     "when": "activeCustomEditorId == 'editor.excalidraw'",
+                    "group": "navigation"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "excalidraw.convertMarkdownToExcalidraw",
+                    "when": "resourceFilename =~ /\\.excalidraw\\.md$/",
                     "group": "navigation"
                 }
             ],
