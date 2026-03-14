@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { newUntitledExcalidrawDocument, newExcalidrawMarkdownDocument } from "./utils";
+import { importFromObsidian, convertInPlace } from "./convert";
 
 function getConfigurationScope(
   config: vscode.WorkspaceConfiguration,
@@ -148,5 +149,11 @@ export function registerCommands(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(
     vscode.commands.registerCommand("excalidraw.newMarkdownFile", newMarkdownFile)
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("excalidraw.importFromObsidian", importFromObsidian)
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("excalidraw.convertMarkdownToExcalidraw", convertInPlace)
   );
 }
