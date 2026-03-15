@@ -114,9 +114,20 @@ export async function importFromObsidian(): Promise<void> {
  */
 export async function convertInPlace(uri?: vscode.Uri): Promise<void> {
   if (!uri) {
+    // Check text editor first
     const activeEditor = vscode.window.activeTextEditor;
     if (activeEditor && activeEditor.document.uri.fsPath.endsWith(".excalidraw.md")) {
       uri = activeEditor.document.uri;
+    } else {
+      // .excalidraw.md files open in a custom editor, not a text editor — check active tab
+      const activeTab = vscode.window.tabGroups.activeTabGroup.activeTab;
+      const input = activeTab?.input;
+      if (input && typeof input === "object" && "uri" in input) {
+        const tabUri = (input as { uri: vscode.Uri }).uri;
+        if (tabUri.fsPath.endsWith(".excalidraw.md")) {
+          uri = tabUri;
+        }
+      }
     }
   }
 

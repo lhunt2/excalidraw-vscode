@@ -1,0 +1,106 @@
+title: "Excalidraw Unified — VS Code Extension Architecture"
+direction: TB
+
+nodes:
+  - id: excalidraw_file
+    label: ".excalidraw"
+    role: input
+  - id: md_file
+    label: ".excalidraw.md"
+    role: input
+  - id: svg_file
+    label: ".excalidraw.svg"
+    role: input
+  - id: png_file
+    label: ".excalidraw.png"
+    role: input
+
+  - id: editor_provider
+    label: "Editor Provider"
+    role: orchestrator
+    subtitle: "editor.ts — routes content types"
+
+  - id: document
+    label: "Document"
+    role: agent
+    subtitle: "document.ts — read/write/revert"
+
+  - id: adapter
+    label: "MD Adapter"
+    role: tool
+    subtitle: "parse ↔ serialize"
+
+  - id: is_md
+    label: "Is .md?"
+    role: decision
+
+  - id: webview
+    label: "Excalidraw React"
+    role: llm
+    subtitle: "webview — canvas editor"
+
+  - id: obsidian
+    label: "Obsidian Vault"
+    role: memory
+    subtitle: "source .excalidraw.md files"
+
+  - id: convert
+    label: "Convert"
+    role: tool
+    subtitle: "convert.ts — strip markdown"
+
+  - id: output
+    label: ".excalidraw"
+    role: output
+
+edges:
+  - from: excalidraw_file
+    to: editor_provider
+    label: "open"
+  - from: md_file
+    to: editor_provider
+    label: "open"
+  - from: svg_file
+    to: editor_provider
+    label: "open"
+  - from: png_file
+    to: editor_provider
+    label: "open"
+
+  - from: editor_provider
+    to: document
+    label: "load content"
+  - from: document
+    to: is_md
+  - from: is_md
+    to: adapter
+    label: "yes"
+  - from: is_md
+    to: webview
+    label: "no — raw JSON"
+  - from: adapter
+    to: webview
+    label: "extracted JSON"
+  - from: webview
+    to: document
+    label: "save changes"
+    style: dashed
+
+  - from: obsidian
+    to: convert
+    label: "import"
+  - from: md_file
+    to: convert
+    label: "convert in place"
+    style: dashed
+  - from: convert
+    to: output
+    label: "bare JSON"
+
+groups:
+  - id: ext_host
+    label: "Extension Host (TypeScript)"
+    nodes: [editor_provider, document, is_md, adapter, convert]
+  - id: file_types
+    label: "Supported File Types"
+    nodes: [excalidraw_file, md_file, svg_file, png_file]
